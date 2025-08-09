@@ -30,8 +30,7 @@ while rodando:
     teclas = pygame.key.get_pressed()
 
     # --- Logica ---
-
-    # mover raquete
+    # mover objetos
     movendo = 0
     if teclas[pygame.K_UP] and raqueteJogador.y > 0: 
         raqueteJogador.y -= VELOCIDADE_RAQUETE
@@ -44,7 +43,6 @@ while rodando:
     bola.y += velocidadeBola[YVALUE]
 
     # colisão
-    
     if bola.x < 55 or bola.x > LARGURA-55:
         # o número mágico (55) vem do fato de que a bola tem que estar pelo menos
         # a uma distância de
@@ -73,10 +71,6 @@ while rodando:
         bola.x = LARGURA/2
         bola.y = ALTURA/2
         velocidadeBola[XVALUE] *= -1
-
-
-    # mover bola
-
 
     # --- Construção da tela ---
     tela.fill(COR_FUNDO)
