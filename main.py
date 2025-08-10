@@ -57,20 +57,24 @@ while rodando:
                 velocidadeBola[YVALUE] *= -1
             else:
                 velocidadeBola[XVALUE] *= -1
+        # a colisão com a parede lateral também só é possível a partir desse ponto, então
+        # não custa nada colocar essa colisão dentro dessa condição também, e salva
+        # recursos em não checar esses valores todo frame
+        if bola.x+velocidadeBola[XVALUE] <= 0:
+            velocidadeBola = (VELOCIDADE_INICIAL_BOLA*-1).copy()
+            bola.x = LARGURA/2
+            bola.y = ALTURA/2
+            velocidadeBola[XVALUE] *= -1
+        elif bola.x+velocidadeBola[XVALUE] >= LARGURA:
+            velocidadeBola = VELOCIDADE_INICIAL_BOLA.copy()
+            bola.x = LARGURA/2
+            bola.y = ALTURA/2
+            velocidadeBola[XVALUE] *= -1
 
     if bola.y <= 0 or bola.y >= ALTURA: 
         velocidadeBola[YVALUE] *= -1
 
-    if bola.x+velocidadeBola[XVALUE] <= 0:
-        velocidadeBola = (VELOCIDADE_INICIAL_BOLA*-1).copy()
-        bola.x = LARGURA/2
-        bola.y = ALTURA/2
-        velocidadeBola[XVALUE] *= -1
-    elif bola.x+velocidadeBola[XVALUE] >= LARGURA:
-        velocidadeBola = VELOCIDADE_INICIAL_BOLA.copy()
-        bola.x = LARGURA/2
-        bola.y = ALTURA/2
-        velocidadeBola[XVALUE] *= -1
+    
 
     # --- Construção da tela ---
     tela.fill(COR_FUNDO)
