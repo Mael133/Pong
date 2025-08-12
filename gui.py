@@ -1,13 +1,5 @@
 import pygame
 
-pygame.init()
-
-#Definições iniciais da janela
-largura = 800
-altura = 600
-tela = pygame.display.set_mode((largura, altura))
-pygame.display.set_caption("Pong")
-
 #Classe de botões, para criar botões na interface
 class Botao:
     #Inicializa o botão e seus parâmetros
@@ -36,3 +28,83 @@ class Botao:
             and event.button == 1
             and self.rect.collidepoint(event.pos)
         )
+    
+#Função para executar o menu
+def menu_principal(tela, largura, altura):
+    fonte = pygame.font.Font(None, 40)
+    fonte_titulo = pygame.font.Font(None, 80)
+
+    titulo = "PONG ONLINE"
+    titulo_cor = (255, 255, 255)
+    titulo_superficie = fonte_titulo.render(titulo, True, titulo_cor)
+
+    titulo_rect = titulo_superficie.get_rect()
+    titulo_rect.center = (largura//2, altura//4)
+
+    # Criar botões
+    botao_host = Botao(300, 400, 200, 50, "CRIAR SALA", fonte, (255, 255, 255), (0, 0, 0), (148, 236, 162))
+    botao_conect = Botao(300, 200, 200, 50, "CONECTAR", fonte, (255, 255, 255), (0, 0, 0), (148, 193, 236))
+    botao_sair = Botao(300, 300, 200, 50, "SAIR", fonte, (255, 255, 255), (0, 0, 0), (236, 148, 148))
+
+    
+    while True:
+        tela.fill((30, 30, 30))  # Fundo
+        tela.blit(titulo_superficie, titulo_rect)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
+            if botao_conect.is_clicked(event):
+                menu_conexao(tela, largura, altura)
+
+            if botao_sair.is_clicked(event):
+                pygame.quit()
+                exit()
+
+        #Desenha os botões
+        botao_conect.draw_button(tela)
+        botao_sair.draw_button(tela)
+        botao_host.draw_button(tela)
+
+        pygame.display.flip()
+
+#Menu de conexão
+def menu_conexao(tela, largura, altura):
+    fonte = pygame.font.Font(None, 40)
+    fonte_titulo = pygame.font.Font(None, 80)
+
+    titulo = "PONG ONLINE"
+    titulo_superficie = fonte_titulo.render(titulo, True, (255, 255, 255))
+
+    titulo_rect = titulo_superficie.get_rect()
+    titulo_rect.center = (largura//2, altura//4)
+
+    # Criar botões
+    botao_TCP = Botao(150, 250, 200, 50, "TCP", fonte, (255, 255, 255), (0, 0, 0), (148, 193, 236))
+    botao_UDP = Botao(450, 250, 200, 50, "UDP", fonte, (255, 255, 255), (0, 0, 0), (148, 193, 236))
+
+    
+    while True:
+        tela.fill((30, 30, 30))  # Fundo
+        tela.blit(titulo_superficie, titulo_rect)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
+            if botao_TCP.is_clicked(event):
+                pygame.quit()
+                exit()
+
+            if botao_UDP.is_clicked(event):
+                pygame.quit()
+                exit()
+
+        #Desenha os botões
+        botao_TCP.draw_button(tela)
+        botao_UDP.draw_button(tela)
+
+        pygame.display.flip()

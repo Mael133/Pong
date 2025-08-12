@@ -1,6 +1,7 @@
 from pong import *
 from rede import *
 import threading
+import gui
 pygame.init()
 
 tela = pygame.display.set_mode((LARGURA, ALTURA))
@@ -23,7 +24,6 @@ score = 0
 oponenteScore = 0
 
 #--- Conexão Inicial ---
-
 cargo = input("Criar(c) uma partida ou entrar(e) em uma? (c/e): ")
 tipoIP = input("Qual a família IP da sala? (ipv4/ipv6): ")
 protocolo = input("Qual o protocolo da sala? (tcp/udp): ")
