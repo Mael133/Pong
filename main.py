@@ -23,16 +23,11 @@ score = 0
 oponenteScore = 0
 
 #--- Conexão Inicial ---
-'''
+
 cargo = input("Criar(c) uma partida ou entrar(e) em uma? (c/e): ")
 tipoIP = input("Qual a família IP da sala? (ipv4/ipv6): ")
 protocolo = input("Qual o protocolo da sala? (tcp/udp): ")
 porta = int(input("Qual a porta da sala?(ex.: 12345): "))
-'''
-cargo = input("Criar(c) uma partida ou entrar(e) em uma? (c/e): ")
-tipoIP = "ipv4"
-protocolo = "udp"
-porta = 12345
 
 if cargo == "c":
     host = "0.0.0.0" if tipoIP == "ipv4" else "::"
