@@ -32,8 +32,7 @@ porta = int(input("Qual a porta da sala?(ex.: 12345): "))
 if cargo == "c":
     host = "0.0.0.0" if tipoIP == "ipv4" else "::"
 else:
-    #host = input(f"Qual o {tipoIP.upper()} da sala?: ")
-    host = "127.0.0.1"
+    host = input(f"Qual o {tipoIP.upper()} da sala?: ")
 
 sock = criarSocket(host, protocolo)
 conexao = sock
@@ -76,6 +75,7 @@ def receberEstado():
             if cargo == "e":
                 bola.x = dados["bolax"]
                 bola.y = dados["bolay"]
+
 # --- Thread de Envio ---
 def enviarEstado():
     global rodando
