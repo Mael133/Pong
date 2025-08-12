@@ -24,20 +24,19 @@ score = 0
 oponenteScore = 0
 
 #--- Conexão Inicial ---
-cargo = input("Criar(c) uma partida ou entrar(e) em uma? (c/e): ")
-tipoIP = input("Qual a família IP da sala? (ipv4/ipv6): ")
-protocolo = input("Qual o protocolo da sala? (tcp/udp): ")
-porta = int(input("Qual a porta da sala?(ex.: 12345): "))
-
-if cargo == "c":
+cargo = gui.menu_principal(tela, LARGURA)
+protocolo = gui.menu_protocolo(tela, LARGURA, ALTURA)
+tipoIP = gui.menu_tipo_ip(tela, LARGURA, ALTURA)
+porta = int(gui.menu_porta(tela, LARGURA, ALTURA))
+if cargo == "host":
     host = "0.0.0.0" if tipoIP == "ipv4" else "::"
 else:
-    host = input(f"Qual o {tipoIP.upper()} da sala?: ")
+    host = gui.menu_ip(tela, LARGURA, ALTURA)
 
 sock = criarSocket(host, protocolo)
 conexao = sock
 
-if cargo == "c": # host
+if cargo == "host": # host
     sock.bind((host, porta))
     if protocolo == "tcp":
         sock.listen(1)
@@ -72,7 +71,7 @@ def receberEstado():
         dados, endereco = receberDados(conexao, protocolo)
         with lock:
             raqueteOponente.y = dados["y"]
-            if cargo == "e":
+            if cargo == "cliente":
                 bola.x = dados["bolax"]
                 bola.y = dados["bolay"]
 
@@ -80,7 +79,7 @@ def receberEstado():
 def enviarEstado():
     global rodando
     while rodando:
-        if cargo == "c":
+        if cargo == "host":
             enviarDados(conexao, {
                                 "y":raqueteJogador.y,
                                 "bolax":int(LARGURA-bola.x),
@@ -118,7 +117,7 @@ while rodando:
     bola.y += velocidadeBola[YVALUE]
 
     # colisão
-    if cargo == "c":
+    if cargo == "host":
         if bola.x < 55 or bola.x > LARGURA-55:
             # o número mágico (55) vem do fato de que a bola tem que estar pelo menos
             # a uma distância de
