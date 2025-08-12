@@ -2,6 +2,8 @@ from pong import *
 from rede import *
 import threading
 import gui
+import time
+
 pygame.init()
 
 tela = pygame.display.set_mode((LARGURA, ALTURA))
@@ -32,6 +34,8 @@ if cargo == "host":
     host = "0.0.0.0" if tipoIP == "ipv4" else "::"
 else:
     host = gui.menu_ip(tela, LARGURA, ALTURA)
+
+pygame.display.set_caption(cargo)
 
 sock = criarSocket(host, protocolo)
 conexao = sock
@@ -74,6 +78,7 @@ def receberEstado():
             if cargo == "cliente":
                 bola.x = dados["bolax"]
                 bola.y = dados["bolay"]
+        time.sleep(1/60)
 
 # --- Thread de Envio ---
 def enviarEstado():
@@ -89,6 +94,8 @@ def enviarEstado():
                                     protocolo, endereco)
             else:
                 enviarDados(conexao, {"y":raqueteJogador.y}, protocolo, endereco)
+        time.sleep(1/60)
+
 
 threadRecebimento = threading.Thread(target=receberEstado)
 threadEnvio       = threading.Thread(target=enviarEstado)
@@ -106,49 +113,47 @@ while rodando:
 
     # --- Logica ---
     # mover objetos
-    with lock:
-        movendo = 0
-        if teclas[pygame.K_UP] and raqueteJogador.y > 0: 
-            raqueteJogador.y -= VELOCIDADE_RAQUETE
-            movendo = -1
-        if teclas[pygame.K_DOWN] and ((raqueteJogador.y+raqueteJogador.altura) < ALTURA):
-            raqueteJogador.y += VELOCIDADE_RAQUETE
-            movendo = 1
+    if teclas[pygame.K_UP] and raqueteJogador.y > 0: 
+        raqueteJogador.y -= VELOCIDADE_RAQUETE
+    if teclas[pygame.K_DOWN] and ((raqueteJogador.y+raqueteJogador.altura) < ALTURA):
+        raqueteJogador.y += VELOCIDADE_RAQUETE
 
-        bola.x += velocidadeBola[XVALUE]
-        bola.y += velocidadeBola[YVALUE]
+    if cargo == "host":
+        with lock:
+            bola.x += velocidadeBola[XVALUE]
+            bola.y += velocidadeBola[YVALUE]
 
-        # colisão
-        if bola.x < 55 or bola.x > LARGURA-55:
-            # o número mágico (55) vem do fato de que a bola tem que estar pelo menos
-            # a uma distância de
-            # 20 (raquete até parede) + 20 (largura da raquete) + 14 (diametro da bola)
-            # isso dá 54, aí eu adicionei 1 por desencargo de consciência.
-            # Vai que o código quebra, sla.
-            if colisao(bola.x, bola.y, raqueteJogador
-            ) or colisao(bola.x, bola.y, raqueteOponente): 
-                bola.x -= velocidadeBola[XVALUE]
-                bola.y -= velocidadeBola[YVALUE]
-                if bola.x < (20+raqueteOponente.largura) or bola.x > (LARGURA-20-raqueteOponente.largura):
-                    velocidadeBola[YVALUE] *= -1
-                else:
+            # colisão
+            if bola.x < 55 or bola.x > LARGURA-55:
+                # o número mágico (55) vem do fato de que a bola tem que estar pelo menos
+                # a uma distância de
+                # 20 (raquete até parede) + 20 (largura da raquete) + 14 (diametro da bola)
+                # isso dá 54, aí eu adicionei 1 por desencargo de consciência.
+                # Vai que o código quebra, sla.
+                if colisao(bola.x, bola.y, raqueteJogador
+                ) or colisao(bola.x, bola.y, raqueteOponente): 
+                    bola.x -= velocidadeBola[XVALUE]
+                    bola.y -= velocidadeBola[YVALUE]
+                    if bola.x < (20+raqueteOponente.largura) or bola.x > (LARGURA-20-raqueteOponente.largura):
+                        velocidadeBola[YVALUE] *= -1
+                    else:
+                        velocidadeBola[XVALUE] *= -1
+                # a colisão com a parede lateral também só é possível a partir desse ponto, então
+                # não custa nada colocar essa colisão dentro dessa condição também, e salva
+                # recursos em não checar esses valores todo frame
+                if bola.x+velocidadeBola[XVALUE] <= 0:
+                    velocidadeBola = (VELOCIDADE_INICIAL_BOLA*-1).copy()
+                    bola.x = LARGURA/2
+                    bola.y = ALTURA/2
                     velocidadeBola[XVALUE] *= -1
-            # a colisão com a parede lateral também só é possível a partir desse ponto, então
-            # não custa nada colocar essa colisão dentro dessa condição também, e salva
-            # recursos em não checar esses valores todo frame
-            if bola.x+velocidadeBola[XVALUE] <= 0:
-                velocidadeBola = (VELOCIDADE_INICIAL_BOLA*-1).copy()
-                bola.x = LARGURA/2
-                bola.y = ALTURA/2
-                velocidadeBola[XVALUE] *= -1
-            elif bola.x+velocidadeBola[XVALUE] >= LARGURA:
-                velocidadeBola = VELOCIDADE_INICIAL_BOLA.copy()
-                bola.x = LARGURA/2
-                bola.y = ALTURA/2
-                velocidadeBola[XVALUE] *= -1
+                elif bola.x+velocidadeBola[XVALUE] >= LARGURA:
+                    velocidadeBola = VELOCIDADE_INICIAL_BOLA.copy()
+                    bola.x = LARGURA/2
+                    bola.y = ALTURA/2
+                    velocidadeBola[XVALUE] *= -1
 
-        if bola.y <= 0 or bola.y >= ALTURA: 
-            velocidadeBola[YVALUE] *= -1
+            if bola.y <= 0 or bola.y >= ALTURA: 
+                velocidadeBola[YVALUE] *= -1
 
     # --- Construção da tela ---
     tela.fill(COR_FUNDO)
@@ -160,6 +165,7 @@ while rodando:
 
     # --- Atualiza a Tela ---
     pygame.display.flip()
+    time.sleep(1/60)
     CLOCK.tick(60)
 
 
