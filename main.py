@@ -68,7 +68,7 @@ def receberEstado():
     global rodando
     global estado
     while rodando:
-        dados, endereco = receberDados(conexao, protocolo)
+        dados, _ = receberDados(conexao, protocolo)
         with lock:
             raqueteOponente.y = dados["y"]
             if cargo == "cliente":
@@ -79,15 +79,16 @@ def receberEstado():
 def enviarEstado():
     global rodando
     while rodando:
-        if cargo == "host":
-            enviarDados(conexao, {
-                                "y":raqueteJogador.y,
-                                "bolax":int(LARGURA-bola.x),
-                                "bolay":int(bola.y)
-                                }, 
-                                protocolo, endereco)
-        else:
-            enviarDados(conexao, {"y":raqueteJogador.y}, protocolo, endereco)
+        with lock:
+            if cargo == "host":
+                enviarDados(conexao, {
+                                    "y":raqueteJogador.y,
+                                    "bolax":int(LARGURA-bola.x),
+                                    "bolay":int(bola.y)
+                                    }, 
+                                    protocolo, endereco)
+            else:
+                enviarDados(conexao, {"y":raqueteJogador.y}, protocolo, endereco)
 
 threadRecebimento = threading.Thread(target=receberEstado)
 threadEnvio       = threading.Thread(target=enviarEstado)
@@ -105,19 +106,19 @@ while rodando:
 
     # --- Logica ---
     # mover objetos
-    movendo = 0
-    if teclas[pygame.K_UP] and raqueteJogador.y > 0: 
-        raqueteJogador.y -= VELOCIDADE_RAQUETE
-        movendo = -1
-    if teclas[pygame.K_DOWN] and ((raqueteJogador.y+raqueteJogador.altura) < ALTURA):
-        raqueteJogador.y += VELOCIDADE_RAQUETE
-        movendo = 1
+    with lock:
+        movendo = 0
+        if teclas[pygame.K_UP] and raqueteJogador.y > 0: 
+            raqueteJogador.y -= VELOCIDADE_RAQUETE
+            movendo = -1
+        if teclas[pygame.K_DOWN] and ((raqueteJogador.y+raqueteJogador.altura) < ALTURA):
+            raqueteJogador.y += VELOCIDADE_RAQUETE
+            movendo = 1
 
-    bola.x += velocidadeBola[XVALUE]
-    bola.y += velocidadeBola[YVALUE]
+        bola.x += velocidadeBola[XVALUE]
+        bola.y += velocidadeBola[YVALUE]
 
-    # colisão
-    if cargo == "host":
+        # colisão
         if bola.x < 55 or bola.x > LARGURA-55:
             # o número mágico (55) vem do fato de que a bola tem que estar pelo menos
             # a uma distância de
