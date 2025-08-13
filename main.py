@@ -66,19 +66,16 @@ if cargo == "host": # host
         conexao, endereco = sock.accept()
         conexao.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         # diminui o delay do tcp
-        a, b = endereco
     else:
         dados, endereco = receberDados(conexao, protocolo)
-        if endereco:
-            a, b = endereco
-    print(f"Conectado a {a}:{b} utilizando {protocolo}.") 
+    print(f"Conectado a {endereco[0]}:{endereco[1]} utilizando {protocolo}.") 
 else: # cliente
     endereco = (host, porta)
     if protocolo == "tcp":
         sock.connect(endereco)
     else:
         enviarDados(conexao, {}, protocolo, endereco)
-    print(f"Conectado a {host}:{porta} utilizando {protocolo}.")
+    print(f"Conectado a {endereco[0]}:{endereco[1]} utilizando {protocolo}.")
 
 rodando = True
 
@@ -95,6 +92,9 @@ def receberEstado():
         # então função receberDados dá erro na leitura, e isso faz 
         # com que crashe o programa quando modificando os dados.   
         if dados:
+            if dados["y"] == "sair":
+                rodando = False
+                break
             with lock:
                 raqueteOponente.y = dados["y"]
                 if cargo == "cliente":
@@ -116,6 +116,8 @@ def enviarEstado():
                                     protocolo, endereco)
             else:
                 enviarDados(conexao, {"y":raqueteJogador.y}, protocolo, endereco)
+        if not rodando:
+            enviarDados(conexao, {"y":"sair"}, protocolo, endereco)
         time.sleep(1/60)
 
 # inicia as threads
@@ -131,6 +133,7 @@ while rodando:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             rodando = False
+            enviarDados(conexao, {"y":"sair"}, protocolo, endereco)
     teclas = pygame.key.get_pressed()
 
     # --- Logica ---
@@ -191,7 +194,6 @@ while rodando:
     # --- Atualiza a Tela ---
     pygame.display.flip()
     CLOCK.tick(60)
-
 
 threadRecebimento.join()
 threadEnvio.join()
