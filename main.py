@@ -4,16 +4,19 @@ import threading
 import gui
 import time
 
+# Configurações iniciais
 pygame.init()
 
 tela = pygame.display.set_mode((LARGURA, ALTURA))
 pygame.display.set_caption("Pong")
 CLOCK = pygame.time.Clock()
 
+
+# cria o estado inicial do jogo
 bola = circulo(LARGURA//2, ALTURA//2, 7)
-raqueteOponente = retangulo(LARGURA-RAQUETE_LARGURA-20, (ALTURA-RAQUETE_ALTURA)/2, 
+raqueteOponente = retangulo(LARGURA-RAQUETE_LARGURA-ESPACAMENTOPAREDE, (ALTURA-RAQUETE_ALTURA)/2, 
                            RAQUETE_LARGURA, RAQUETE_ALTURA)
-raqueteJogador = retangulo(20, (ALTURA-RAQUETE_ALTURA)/2, 
+raqueteJogador = retangulo(ESPACAMENTOPAREDE, (ALTURA-RAQUETE_ALTURA)/2, 
                             RAQUETE_LARGURA, RAQUETE_ALTURA)
 
 XVALUE = 0
@@ -26,17 +29,19 @@ score = 0
 oponenteScore = 0
 
 #--- Conexão Inicial ---
+# pegar os dados necessários
 cargo = gui.menu_principal(tela, LARGURA)
-protocolo = gui.menu_protocolo(tela, LARGURA, ALTURA)
-tipoIP = gui.menu_tipo_ip(tela, LARGURA, ALTURA)
-porta = int(gui.menu_porta(tela, LARGURA, ALTURA))
+protocolo = gui.menu_opcoes(tela, LARGURA, ALTURA, "QUAL O TIPO DE CONEXÃO?", "TCP", "UDP")
+tipoIP = gui.menu_opcoes(tela, LARGURA, ALTURA, "QUAL O TIPO DE IP?", "IPV4", "IPV6")
+porta = int(gui.menu_digitar(tela, LARGURA, ALTURA, "QUAL A PORTA DA SALA?"))
 if cargo == "host":
     host = "0.0.0.0" if tipoIP == "ipv4" else "::"
 else:
-    host = gui.menu_ip(tela, LARGURA, ALTURA)
+    host = gui.menu_digitar(tela, LARGURA, ALTURA, "QUAL O IP DA SALA?")
 
 pygame.display.set_caption(cargo)
 
+# criar o socket e efetivar a conexão
 sock = criarSocket(host, protocolo)
 conexao = sock
 
@@ -51,7 +56,6 @@ if cargo == "host": # host
         print(f"Conectado a {a}:{b}.") 
     else:
         dados, endereco = receberDados(conexao, protocolo)
-        print(dados["teste"])
         if endereco:
             a, b = endereco
             print(f"Conectado a {a}:{b}.")
@@ -60,7 +64,7 @@ else: # cliente
     if protocolo == "tcp":
         sock.connect(endereco)
     else:
-        enviarDados(conexao, {"teste":"teste"}, protocolo, endereco)
+        enviarDados(conexao, {}, protocolo, endereco)
     print(f"Conectado a {host}:{porta}.")
 
 rodando = True
@@ -96,7 +100,7 @@ def enviarEstado():
                 enviarDados(conexao, {"y":raqueteJogador.y}, protocolo, endereco)
         time.sleep(1/60)
 
-
+# inicia as threads
 threadRecebimento = threading.Thread(target=receberEstado)
 threadEnvio       = threading.Thread(target=enviarEstado)
 threadRecebimento.start()
@@ -123,13 +127,15 @@ while rodando:
             bola.x += velocidadeBola[XVALUE]
             bola.y += velocidadeBola[YVALUE]
 
+            distanciaMinimaParaColisao = ESPACAMENTOPAREDE + RAQUETE_LARGURA + BOLA_RAIO
+            # a bola só pode colidor com algo lateralente se 
+            # tiver a pelo menos essa distancia da parede 
+
             # colisão
-            if bola.x < 55 or bola.x > LARGURA-55:
-                # o número mágico (55) vem do fato de que a bola tem que estar pelo menos
-                # a uma distância de
-                # 20 (raquete até parede) + 20 (largura da raquete) + 14 (diametro da bola)
-                # isso dá 54, aí eu adicionei 1 por desencargo de consciência.
-                # Vai que o código quebra, sla.
+            if bola.x < distanciaMinimaParaColisao+1 or bola.x > LARGURA-distanciaMinimaParaColisao-1:
+                # O mais ou menos 1 é pra  garantir que em cenários
+                # de colisão de quina a bola não entre nas raquetes
+
                 if colisao(bola.x, bola.y, raqueteJogador
                 ) or colisao(bola.x, bola.y, raqueteOponente): 
                     bola.x -= velocidadeBola[XVALUE]
@@ -138,6 +144,7 @@ while rodando:
                         velocidadeBola[YVALUE] *= -1
                     else:
                         velocidadeBola[XVALUE] *= -1
+
                 # a colisão com a parede lateral também só é possível a partir desse ponto, então
                 # não custa nada colocar essa colisão dentro dessa condição também, e salva
                 # recursos em não checar esses valores todo frame

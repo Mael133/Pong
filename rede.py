@@ -21,9 +21,9 @@ def criarSocket(ip, protocolo):
     return sock
 
 def enviarDados(sock, dados, protocolo, oponente_addr=None):
-    dados = json.dumps(dados).encode('utf-8')
+    dados = json.dumps(dados).encode("utf-8")
     try:
-        if protocolo == 'tcp':
+        if protocolo == "tcp":
             sock.sendall(dados)
         else:
             if oponente_addr:
