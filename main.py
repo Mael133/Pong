@@ -67,19 +67,18 @@ if cargo == "host": # host
         conexao.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         # diminui o delay do tcp
         a, b = endereco
-        print(f"Conectado a {a}:{b}.") 
     else:
         dados, endereco = receberDados(conexao, protocolo)
         if endereco:
             a, b = endereco
-            print(f"Conectado a {a}:{b}.")
+    print(f"Conectado a {a}:{b} utilizando {protocolo}.") 
 else: # cliente
     endereco = (host, porta)
     if protocolo == "tcp":
         sock.connect(endereco)
     else:
         enviarDados(conexao, {}, protocolo, endereco)
-    print(f"Conectado a {host}:{porta}.")
+    print(f"Conectado a {host}:{porta} utilizando {protocolo}.")
 
 rodando = True
 

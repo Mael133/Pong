@@ -31,8 +31,8 @@ class retangulo:
         self.altura = altura
 
 def colisao(circulox, circuloy, ret, raio=BOLA_RAIO):
-    # retornaverdadeiro se há uma intersecção entre o círculo
-    # e o retângulo passados, e falso sen não houver
+    # retorna verdadeiro se há uma intersecção entre o círculo
+    # e o retângulo passados, e falso se não houver
 
     # Diz Ryan que é matemática básica
 
