@@ -90,12 +90,17 @@ def receberEstado():
     global estado
     while rodando:
         dados, _ = receberDados(conexao, protocolo)
-        with lock:
-            raqueteOponente.y = dados["y"]
-            if cargo == "cliente":
-                bola.x = dados["bolax"]
-                bola.y = dados["bolay"]
-        time.sleep(1/60)
+        # quando usando tcp, os usuários podem dessincronizar,
+        # fazendo com que as mensagens se misturem uma com a outra,
+        # então função receberDados dá erro na leitura, e isso faz 
+        # com que crashe o programa quando modificando os dados.   
+        if dados:
+            with lock:
+                raqueteOponente.y = dados["y"]
+                if cargo == "cliente":
+                    bola.x = dados["bolax"]
+                    bola.y = dados["bolay"]
+            time.sleep(1/60)
 
 # --- Thread de Envio ---
 def enviarEstado():
@@ -185,7 +190,6 @@ while rodando:
 
     # --- Atualiza a Tela ---
     pygame.display.flip()
-    time.sleep(1/60)
     CLOCK.tick(60)
 
 
