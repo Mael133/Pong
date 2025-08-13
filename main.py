@@ -10,7 +10,7 @@ pygame.init()
 tela = pygame.display.set_mode((LARGURA, ALTURA))
 pygame.display.set_caption("Pong")
 CLOCK = pygame.time.Clock()
-
+fonte = pygame.font.Font(None, 40)
 
 # cria o estado inicial do jogo
 bola = circulo(LARGURA//2, ALTURA//2, 7)
@@ -29,15 +29,29 @@ score = 0
 oponenteScore = 0
 
 #--- Conexão Inicial ---
+
 # pegar os dados necessários
-cargo = gui.menu_principal(tela, LARGURA)
-protocolo = gui.menu_opcoes(tela, LARGURA, ALTURA, "QUAL O TIPO DE CONEXÃO?", "TCP", "UDP")
-tipoIP = gui.menu_opcoes(tela, LARGURA, ALTURA, "QUAL O TIPO DE IP?", "IPV4", "IPV6")
-porta = int(gui.menu_digitar(tela, LARGURA, ALTURA, "QUAL A PORTA DA SALA?"))
+
+cargo = gui.menuInput(tela, LARGURA, fonte, "PONG ONLINE",[
+                    gui.Botao(300, 250, 200, 50, "CRIAR SALA", fonte, (255, 255, 255), (0, 0, 0), (148, 236, 162)),
+                    gui.Botao(300, 350, 200, 50, "CONECTAR", fonte, (255, 255, 255), (0, 0, 0), (148, 193, 236)),
+                    gui.Botao(300, 450, 200, 50, "SAIR", fonte, (255, 255, 255), (0, 0, 0), (236, 148, 148))])
+protocolo = gui.menuInput(tela, LARGURA, fonte, "QUAL O PROTOCOLO DA SALA?",[
+                    gui.Botao(150, 250, 200, 50, "TCP", fonte, (255, 255, 255), (0, 0, 0), (148, 236, 162)),
+                    gui.Botao(450, 250, 200, 50, "UDP", fonte, (255, 255, 255), (0, 0, 0), (148, 193, 236))])
+tipoIP = gui.menuInput(tela, LARGURA, fonte, "QUAL O TIPO IP DA SALA?",[
+                    gui.Botao(150, 250, 200, 50, "IPV4", fonte, (255, 255, 255), (0, 0, 0), (148, 236, 162)),
+                    gui.Botao(450, 250, 200, 50, "IPV6", fonte, (255, 255, 255), (0, 0, 0), (148, 193, 236))])
+porta = int(gui.menuInput(tela, LARGURA, fonte, "QUAL A PORTA DA SALA?",
+                [gui.Botao(300, 350, 200, 50, "CONFIRMAR", fonte, (255, 255, 255), (0, 0, 0), (148, 236, 162))],
+                gui.caixaDeTexto(150, 250, 500, 50, fonte, (255, 255, 255))))
+
 if cargo == "host":
     host = "0.0.0.0" if tipoIP == "ipv4" else "::"
 else:
-    host = gui.menu_digitar(tela, LARGURA, ALTURA, "QUAL O IP DA SALA?")
+    host = gui.menuInput(tela, LARGURA, fonte, "QUAL O IP DA SALA?",
+                [gui.Botao(300, 350, 200, 50, "CONFIRMAR", fonte, (255, 255, 255), (0, 0, 0), (148, 236, 162))],
+                gui.caixaDeTexto(150, 250, 500, 50, fonte, (255, 255, 255)))
 
 pygame.display.set_caption(cargo)
 
