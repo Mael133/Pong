@@ -100,7 +100,7 @@ def receberEstado():
                 if cargo == "cliente":
                     bola.x = dados["bolax"]
                     bola.y = dados["bolay"]
-            time.sleep(1/60)
+        time.sleep(1/60)
 
 # --- Thread de Envio ---
 def enviarEstado():
