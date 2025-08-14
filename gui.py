@@ -93,3 +93,57 @@ def menuInput(tela, largura, fonte, titulo="", botoes=[], caixaTexto=None, ):
             caixaTexto.draw(tela)
 
         pygame.display.flip()
+
+def menuIntermediario(tela, largura, fonte, status_info):
+    tela.fill((30, 30, 30))  # Fundo
+
+    fonte_titulo = pygame.font.Font(None, 60)
+    fonte_info = pygame.font.Font(None, 32)
+    titulo_cor = (255, 255, 255)
+    info_cor = (200, 200, 200)
+
+    # Desenha o título (status principal)
+    titulo_superficie = fonte_titulo.render(status_info["titulo"], True, titulo_cor)
+    titulo_rect = titulo_superficie.get_rect(center=(largura//2, 150))
+    tela.blit(titulo_superficie, titulo_rect)
+
+    # Desenha informações adicionais (IP, protocolo)
+    if status_info.get("info_extra"):
+        info_extra_superficie = fonte_info.render(status_info["info_extra"], True, info_cor)
+        info_extra_rect = info_extra_superficie.get_rect(center=(largura//2, 220))
+        tela.blit(info_extra_superficie, info_extra_rect)
+
+    # Desenha o prompt/botão
+    if status_info.get("prompt"):
+        prompt_superficie = fonte_info.render(status_info["prompt"], True, info_cor)
+        prompt_rect = prompt_superficie.get_rect(center=(largura//2, 425))
+        tela.blit(prompt_superficie, prompt_rect)
+    
+    if status_info.get("botao"):
+        status_info["botao"].draw(tela)
+
+def menuFimDeJogo(tela, largura, fonte, mensagem, botoes):
+    fonte_titulo = pygame.font.Font(None, 74)
+    titulo_cor = (255, 255, 255)
+    
+    while True:
+        tela.fill((30, 30, 30))  # Fundo
+
+        # Renderizar mensagem de vitória/derrota
+        titulo_superficie = fonte_titulo.render(mensagem, True, titulo_cor)
+        titulo_rect = titulo_superficie.get_rect(center=(largura//2, 250))
+        tela.blit(titulo_superficie, titulo_rect)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return "sair" # Sair por fechar a janela
+
+            for botao in botoes:
+                if botao.is_clicked(event):
+                    return botao.texto.lower() # Retorna o texto do botão clicado
+
+        # Desenhar botões
+        for botao in botoes:
+            botao.draw(tela)
+
+        pygame.display.flip()
