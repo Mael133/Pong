@@ -119,6 +119,16 @@ def main():
                     estado_jogo["rodando"] = False
 
         tela.fill(COR_FUNDO)
+
+        largura_traco = 5
+        altura_traco = 20
+        espaco_vazio = 15
+        cor_linha = (128, 128, 128) # Um cinza para não distrair tanto
+
+        for y in range(0, ALTURA, altura_traco + espaco_vazio):
+            traco = pygame.Rect(LARGURA // 2 - largura_traco // 2, y, largura_traco, altura_traco)
+            pygame.draw.rect(tela, cor_linha, traco)
+
         pygame.draw.circle(tela, COR_OBJETOS, (int(bola.x), int(bola.y)), bola.raio)
         pygame.draw.rect(tela, COR_OBJETOS, 
         (raqueteJogador.x, raqueteJogador.y, raqueteJogador.largura, raqueteJogador.altura))
