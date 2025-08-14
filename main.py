@@ -33,7 +33,7 @@ lock = threading.Lock()
 # --- Função Principal ---
 def main():
     # --- Menu de configuração inicial ---
-    cargo, protocolo, tipoIP, porta, host = gui.configuracaoInicial(tela, fonte, LARGURA)
+    cargo, protocolo, porta, host = gui.configuracaoInicial(tela, fonte, LARGURA)
 
     # --- Conexão inicial ---
     sock, conexao_info = estabelecerConexaoInicial(cargo, protocolo, porta, host, tela, LARGURA, fonte, CLOCK, estado_jogo, lock)
@@ -86,7 +86,7 @@ def main():
                 bola.x += velocidadeBola[XVALUE]
                 bola.y += velocidadeBola[YVALUE]
 
-                distanciaMinimaParaColisao = ESPACAMENTOPAREDE + RAQUETE_LARGURA + BOLA_RAIO
+                distanciaMinimaParaColisao = ESPACAMENTOPAREDE + RAQUETE_LARGURA + BOLA_RAIO + abs(velocidadeBola[XVALUE])
                 if bola.x < distanciaMinimaParaColisao or bola.x > LARGURA - distanciaMinimaParaColisao:
                     if colisao(bola.x, bola.y, raqueteJogador) or colisao(bola.x, bola.y, raqueteOponente):
                         bola.x -= velocidadeBola[XVALUE]
@@ -111,6 +111,7 @@ def main():
                     bola.x, bola.y = LARGURA/2, ALTURA/2
                     velocidadeBola = np.array(VELOCIDADE_INICIAL_BOLA)
                     if np.random.rand() < 0.5: velocidadeBola[XVALUE] *= -1
+                    if np.random.rand() < 0.5: velocidadeBola[YVALUE] *= -1
 
                 estado_jogo["bola_x"], estado_jogo["bola_y"] = bola.x, bola.y
 

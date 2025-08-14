@@ -169,4 +169,4 @@ def  configuracaoInicial(tela, fonte, largura):
                     [Botao(300, 350, 200, 50, "CONFIRMAR", fonte, (255, 255, 255), (0, 0, 0), (148, 236, 162))],
                     caixaDeTexto(150, 250, 500, 50, fonte, (255, 255, 255)))
 
-    return cargo, protocolo, tipoIP, porta, host
+    return cargo, protocolo, porta, host
