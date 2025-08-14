@@ -147,3 +147,26 @@ def menuFimDeJogo(tela, largura, fonte, mensagem, botoes):
             botao.draw(tela)
 
         pygame.display.flip()
+
+def  configuracaoInicial(tela, fonte, largura):
+    cargo = menuInput(tela, largura, fonte, "PONG ONLINE", [
+                        Botao(300, 250, 200, 50, "CRIAR SALA", fonte, (255, 255, 255), (0, 0, 0), (148, 236, 162)),
+                        Botao(300, 350, 200, 50, "CONECTAR", fonte, (255, 255, 255), (0, 0, 0), (148, 193, 236)),
+                        Botao(300, 450, 200, 50, "SAIR", fonte, (255, 255, 255), (0, 0, 0), (236, 148, 148))])
+    protocolo = menuInput(tela, largura, fonte, "QUAL O PROTOCOLO?", [
+                        Botao(150, 250, 200, 50, "TCP", fonte, (255, 255, 255), (0, 0, 0), (148, 236, 162)),
+                        Botao(450, 250, 200, 50, "UDP", fonte, (255, 255, 255), (0, 0, 0), (148, 193, 236))])
+    tipoIP = menuInput(tela, largura, fonte, "QUAL O TIPO DE IP?", [
+                        Botao(150, 250, 200, 50, "IPV4", fonte, (255, 255, 255), (0, 0, 0), (148, 236, 162)),
+                        Botao(450, 250, 200, 50, "IPV6", fonte, (255, 255, 255), (0, 0, 0), (148, 193, 236))])
+    porta = int(menuInput(tela, largura, fonte, "QUAL A PORTA DA SALA?",
+                    [Botao(300, 350, 200, 50, "CONFIRMAR", fonte, (255, 255, 255), (0, 0, 0), (148, 236, 162))],
+                    caixaDeTexto(150, 250, 500, 50, fonte, (255, 255, 255))))
+    if cargo == "host":
+        host = "0.0.0.0" if tipoIP == "ipv4" else "::"
+    else:
+        host = menuInput(tela, largura, fonte, "QUAL O IP DA SALA?",
+                    [Botao(300, 350, 200, 50, "CONFIRMAR", fonte, (255, 255, 255), (0, 0, 0), (148, 236, 162))],
+                    caixaDeTexto(150, 250, 500, 50, fonte, (255, 255, 255)))
+
+    return cargo, protocolo, tipoIP, porta, host

@@ -1,6 +1,11 @@
 import socket
 from ipaddress import IPv4Address, IPv6Address, ip_address
 import json
+from threads import thread_conectar
+from threading import Thread
+import gui
+import pygame
+from select import select
 
 # cria e retorna uma referência a um socket
 # do tipo especificado
@@ -65,3 +70,52 @@ def receberDados(sock, protocolo, buffer=1024):
     except (socket.error, json.JSONDecodeError, ConnectionResetError) as e:
         print(f"Erro ao receber dados. {e}")
         return None, None
+
+def estabelecerConexaoInicial(cargo, protocolo, porta, host, tela, largura, fonte, clock, estado_jogo, lock):
+    sock = criarSocket(host, protocolo)
+    conexao_info = {"thread": None, "conexao": sock, "endereco": None, "conectado": False, "erro": None}
+
+    args_conexao = (conexao_info, cargo, sock, host, porta, protocolo)
+    conexao_info["thread"] = Thread(target=thread_conectar, args=args_conexao, daemon=True)
+    conexao_info["thread"].start()
+
+    status_info = {"titulo": "Aguardando conexão..."}
+    botao_comecar = gui.Botao(largura//2 - 100, 350, 200, 50, "COMEÇAR", fonte, (255, 255, 255), (0, 150, 0), (148, 236, 162))
+
+    esperando_inicio = True
+    while esperando_inicio:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                estado_jogo["rodando"] = False
+                esperando_inicio = False
+            if conexao_info["conectado"] and cargo == "host":
+                if botao_comecar.is_clicked(event):
+                    enviarDados(conexao_info["conexao"], {"controle": "start"}, protocolo, conexao_info["endereco"])
+                    estado_jogo["jogo_iniciado"] = True
+                    esperando_inicio = False
+
+        if not estado_jogo["rodando"]: break
+        
+        if conexao_info["erro"]:
+            status_info["titulo"] = "Erro na conexão"
+            status_info["info_extra"] = conexao_info["erro"]
+        elif conexao_info["conectado"]:
+            status_info["titulo"] = f"Conectado a {conexao_info['endereco'][0]}:{conexao_info['endereco'][1]}"
+            status_info["info_extra"] = f"Utilizando {protocolo.upper()}"
+            if cargo == "host":
+                status_info["botao"] = botao_comecar
+            else:
+                status_info["prompt"] = "Aguardando o host iniciar a partida..."
+                pronto_para_ler, _, _ = select([conexao_info["conexao"]], [], [], 0)
+                if pronto_para_ler:
+                    dados, _ = receberDados(conexao_info["conexao"], protocolo)
+                    if dados and dados.get("controle") == "start":
+                        with lock:
+                            estado_jogo["jogo_iniciado"] = True
+                        esperando_inicio = False
+        
+        gui.menuIntermediario(tela, largura, fonte, status_info)
+        pygame.display.flip()
+        clock.tick(30)
+    
+    return sock, conexao_info
