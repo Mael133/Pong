@@ -103,7 +103,7 @@ Além das atualizações de estado, o protocolo define mensagens de controle par
     ```bash
     JSON
     {
-    "controle": "start"
+      "controle": "start"
     }
     ```
 
@@ -112,7 +112,7 @@ Além das atualizações de estado, o protocolo define mensagens de controle par
     ```bash
     JSON
     {
-    "controle": "sair"
+      "controle": "sair"
     }
     ```
 
