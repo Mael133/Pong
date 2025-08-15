@@ -2,6 +2,7 @@ import select
 import time
 import rede
 import json
+import socket
 from pong import LARGURA
 
 def receberEstado(conexao, protocolo, estado_jogo, lock, cargo):
@@ -91,7 +92,8 @@ def thread_conectar(conexao_info, cargo, sock, host, porta, protocolo):
                 _, endereco = sock.recvfrom(1024)
                 conexao_info["endereco"] = endereco
         else: # cliente
-            endereco = (host, porta)
+            addr_info = socket.getaddrinfo(host, porta, sock.family, sock.type)[0]
+            endereco = addr_info[-1]
             if protocolo == "tcp":
                 sock.connect(endereco)
             else: # udp
