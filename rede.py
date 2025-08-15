@@ -38,7 +38,8 @@ def enviarDados(sock, dados, protocolo, oponente_addr=None):
     # manda os dados pela rede usando o protocolo correto
     try:
         if protocolo == "tcp":
-            sock.sendall(dados)
+            # adiciona um caractere terminador de pacotes
+            sock.sendall(dados + b'\n')
         else:
             if oponente_addr: # só manda por UDP se um endereço foi passado
                 sock.sendto(dados, oponente_addr)
