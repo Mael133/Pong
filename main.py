@@ -3,6 +3,7 @@ from rede import *
 import threading
 import gui
 import threads 
+import math
 
 # --- Configurações iniciais ---
 pygame.init()
@@ -13,7 +14,7 @@ CLOCK = pygame.time.Clock()
 fonte = pygame.font.Font(None, 40)
 
 # --- Constantes do Jogo ---
-PONTUACAO_MAXIMA = 20
+PONTUACAO_MAXIMA = 400
 XVALUE = 0
 YVALUE = 1
 
@@ -87,10 +88,11 @@ def main():
                 bola.y += velocidadeBola[YVALUE]
 
                 distanciaMinimaParaColisao = ESPACAMENTOPAREDE + RAQUETE_LARGURA + BOLA_RAIO + abs(velocidadeBola[XVALUE])
-                if bola.x < distanciaMinimaParaColisao or bola.x > LARGURA - distanciaMinimaParaColisao:
+                if bola.x <= distanciaMinimaParaColisao or bola.x >= (LARGURA - distanciaMinimaParaColisao):
                     if colisao(bola.x, bola.y, raqueteJogador) or colisao(bola.x, bola.y, raqueteOponente):
-                        bola.x -= velocidadeBola[XVALUE]
-                        bola.y -= velocidadeBola[YVALUE]
+                        while colisao(bola.x, bola.y, raqueteJogador) or colisao(bola.x, bola.y, raqueteOponente):
+                            bola.x -= math.copysign(1, velocidadeBola[XVALUE])
+                            bola.y -= math.copysign(1, velocidadeBola[YVALUE])
                         if bola.x < (ESPACAMENTOPAREDE + RAQUETE_LARGURA) or bola.x > (LARGURA - ESPACAMENTOPAREDE - RAQUETE_LARGURA):
                              velocidadeBola[YVALUE] *= -1
                         else:
@@ -109,9 +111,8 @@ def main():
                 
                 if ponto_marcado:
                     bola.x, bola.y = LARGURA/2, ALTURA/2
-                    velocidadeBola = np.array(VELOCIDADE_INICIAL_BOLA)
-                    if np.random.rand() < 0.5: velocidadeBola[XVALUE] *= -1
-                    if np.random.rand() < 0.5: velocidadeBola[YVALUE] *= -1
+                    velocidadeBola[YVALUE] = VELOCIDADE_INICIAL_BOLA[YVALUE]
+                    velocidadeBola[XVALUE] *= -1
 
                 estado_jogo["bola_x"], estado_jogo["bola_y"] = bola.x, bola.y
 
