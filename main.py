@@ -14,7 +14,7 @@ CLOCK = pygame.time.Clock()
 fonte = pygame.font.Font(None, 40)
 
 # --- Constantes do Jogo ---
-PONTUACAO_MAXIMA = 400
+PONTUACAO_MAXIMA = 20
 XVALUE = 0
 YVALUE = 1
 
